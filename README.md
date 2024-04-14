@@ -9,7 +9,7 @@ Yes the name is based on the Neon Genesis Evangelion character.
 It's meant to be used as an intuitive assistant to automate simple or repetitive processes even if you are not at home, and since this is a versatile project, it can be configured to meet the user's necessities without compromising privacy, Ayanami runs entirely locally, so, if the AI can access some of your raw data, it never leaves your computer, but be aware that **information can be shown in the Telegram's chat history**.
 
 > [!WARNING]
-> Even if this project never touches your data and implements security measures to use it, it uses LangChain, the Telegram API, and optionally the OpenAI API, so you need to be aware on how they handle your data.
+> Even if this project never touches your data and implements security measures to use it, it uses LangChain, the Telegram API, and optionally the OpenAI API, so you need to be aware on how they handle your data. **Just be careful with sensitive data you share with it, especially when you send it to someone that is not you.**
 
 Ayanami can use any LangChain Tool (see a list of built-in tools [Here](https://python.langchain.com/docs/integrations/tools/)), each tool is designed to be plugged into the the AI so that it can be used to do something like read a text document or execute a program.
 With that, it can:
@@ -37,3 +37,7 @@ Also, any API keys or any secret of any kind should not be inside any piece of c
 > This project is in its early development stages, so things can and will change, but I'll do my best to never keep this part of the guide outdated. Of course that any help or suggestion is welcome, just use the [Issues tab](https://github.com/JoaoPito/ayanami-bot/issues).
 
 *Sorry, but this part of the guide is empty for now because there is nothing to put here yet. Please come here again in a few days. 🙃*
+
+## Privacy
+- [OpenAI API Privacy Policy](https://openai.com/policies/privacy-policy)
+- [LangChain Privacy Policy](https://www.langchain.com/privacy-policy)
