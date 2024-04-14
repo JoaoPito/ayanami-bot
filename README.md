@@ -5,14 +5,14 @@ Your AI-powered assistant that customizes itself to automate your tasks, conveni
 This project brings an AI (private and local or using OpenAI's GPT3/4) to be your personal assistant through a **Telegram bot**. It's capable of run automations in the host's machine using existing or custom-made *LangChain Tools*, also working as a standard chatbot like ChatGPT. And since it uses Telegram as the main interface, it can be used from anywhere, in PCs, phones, etc, as long as there is an internet connection.
 
 
-Yes the name is based on the Neon Genesis Evangelion character.
+Yes, the name is based on the Neon Genesis Evangelion character.
 
 
 ## What can it do?
 It's meant to be used as an intuitive assistant to automate simple or repetitive processes even if you are not at home, and since this is a versatile project, it can be configured to meet the user's necessities without compromising privacy, Ayanami runs entirely locally, so, if the AI can access some of your raw data, it never leaves your computer, but be aware that **information can be shown in the Telegram's chat history**.
 
 
-> [!WARNING]
+> [!CAUTION]
 > Even if this project never touches your data, it uses LangChain, the Telegram API, and optionally the OpenAI API, so you need to be aware on how they handle your data. **Just be careful with sensitive data you share with it, especially when you send it to someone that is not you.**
 
 
@@ -30,8 +30,10 @@ It can do some other cool things too...
 
 And if you have the python skills, you can even write your own tools to do whatever you want. LangChain is well documented and widely used, and the process of creating a tool from scratch is actually pretty simple! (More info in the [LangChain Tools Documentation](https://python.langchain.com/docs/modules/tools/))
 
-> [!CAUTION]
-> Also, be aware that, very unfortunately, these tools may not work properly with local (Ollama) LLMs, since they are still not stable enough to use them*
+
+> [!WARNING]
+> Also, be aware that, very unfortunately, these tools may not work properly with local (Ollama) LLMs, since they are still not stable enough
+
 
 ## Security Recommendations
 Be aware that this project is meant to be used inside a **safe environment**, more specifically, inside a **Docker** container. 
