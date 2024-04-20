@@ -1,9 +1,6 @@
-from app.app import AyanamiApp
-
 class CommandBase:
-    def __init__(self, name:str, app: AyanamiApp):
+    def __init__(self, name:str):
         self.name = name
-        self.app = app
 
     async def handle(self, **kwargs):
         pass
