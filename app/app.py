@@ -25,3 +25,6 @@ class AyanamiApp():
     def run(self):
         self.ai.run()
         self.chat.run()
+
+    def is_authorized(self, user_id: int):
+        return self.auth.is_authorized(user_id)
