@@ -8,9 +8,9 @@ class AyanamiApp():
     chat: ChatInterface|None = None
 
     def __init__(self, ai: AIInterface, chat: ChatInterface, auth: AuthInterface|None):
-       self.ai = ai
-       self.chat = chat
-       self.auth = auth
+        self.ai = ai
+        self.chat = chat
+        self.auth = auth
 
     def __message_handler__(self, message: ChatMessage):
         response = self.ai.invoke(message.content)
@@ -19,6 +19,9 @@ class AyanamiApp():
     def __reset_handler__(self):
         self.ai.reset()
 
+    def add_command(self, command):
+        self.chat.add_handler(command.name, command.handle)
+
     def run(self):
         self.ai.run()
-        self.bot.run()
+        self.chat.run()
