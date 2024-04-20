@@ -15,7 +15,9 @@ class TelegramChat(ChatBase):
 
     def add_message_handler(self, command: CommandBase):
         self.__add_handler__(command.name, command.handle)
-        self.telegram_app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), command.handle))
+        self.telegram_app.add_handler(
+            MessageHandler(filters.TEXT & (~filters.COMMAND), command.handle)
+            )
 
     def run(self):
         self.telegram_app.run_polling()
