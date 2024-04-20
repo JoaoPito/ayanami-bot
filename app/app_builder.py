@@ -1,7 +1,7 @@
 from ai.ai_interface import AIInterface
 from app.app import AyanamiApp
 from auth.auth_interface import AuthInterface
-from chat.chat_interface import ChatInterface
+from chat.chatbase import ChatBase
 
 error_not_assigned_message = "Parameter '{param}' needed for App wasn't set."
 param_names = {"AI": "AI", "Chat": "Chat"}
@@ -9,7 +9,7 @@ param_names = {"AI": "AI", "Chat": "Chat"}
 class AyanamiAppBuilder():
     tools = []
     ai: AIInterface|None = None
-    chat: ChatInterface|None = None
+    chat: ChatBase|None = None
     auth: AuthInterface|None = None
 
     def __init__(self):
@@ -28,7 +28,7 @@ class AyanamiAppBuilder():
     def set_ai(self, ai:AIInterface):
         self.ai = ai
 
-    def set_chat(self, chat:ChatInterface):
+    def set_chat(self, chat:ChatBase):
         self.chat = chat
 
     def set_authenticator(self, auth:AuthInterface):

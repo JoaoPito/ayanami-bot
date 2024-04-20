@@ -1,13 +1,14 @@
 from auth.auth_interface import AuthInterface
 from chat.message import ChatMessage
 from ai.ai_interface import AIInterface
-from chat.chat_interface import ChatInterface
+from chat.chatbase import ChatBase
+from models.command_base import CommandBase
 
 class AyanamiApp():
     ai: AIInterface|None = None
-    chat: ChatInterface|None = None
+    chat: ChatBase|None = None
 
-    def __init__(self, ai: AIInterface, chat: ChatInterface, auth: AuthInterface|None):
+    def __init__(self, ai: AIInterface, chat: ChatBase, auth: AuthInterface|None):
         self.ai = ai
         self.chat = chat
         self.auth = auth
@@ -19,8 +20,11 @@ class AyanamiApp():
     def __reset_handler__(self):
         self.ai.reset()
 
-    def add_command(self, command):
-        self.chat.add_handler(command.name, command.handle)
+    def add_command_handler(self, command: CommandBase):
+        self.chat.add_command_handler(command)
+
+    def add_message_handler(self, command: CommandBase):
+        self.chat.add_message_handler(command)
 
     def run(self):
         self.ai.run()
