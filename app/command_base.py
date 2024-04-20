@@ -1,10 +1,10 @@
-from ai.ai_interface import AIInterface
-from chat.chat_interface import ChatInterface
+from app.app import AyanamiApp
 
 class CommandBase:
-    def __init__(self, chat: ChatInterface, ai: AIInterface):
-        self.chat = chat
-        self.ai = ai
+    
+    def __init__(self, name:str, app: AyanamiApp):
+        self.name = name
+        self.app = app
 
-    def handle(self, **kwargs):
+    async def handle(self, **kwargs):
         pass
