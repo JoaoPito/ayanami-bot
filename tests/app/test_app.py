@@ -2,7 +2,7 @@ import unittest
 
 from app.app import AyanamiApp
 from tests.ai.stubs import EmptyAIStub
-from tests.app.commands.stubs import MessageCommandStub
+from tests.models.command_stubs import MessageCommandStub
 from tests.auth.stubs import EmptyAuthStub
 from tests.chat.stubs import EmptyChatStub
 

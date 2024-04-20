@@ -1,7 +1,7 @@
 import asyncio
-from chat.chat_interface import ChatInterface
+from chat.chatbase import ChatBase
 
-class EmptyChatStub(ChatInterface):
+class EmptyChatStub(ChatBase):
     filters = {"message": "msg"}
     has_called_add_handler = False
     has_run = False
