@@ -9,9 +9,9 @@ class MessageCommand(CommandBase):
         self.app = app
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        print(context)
-        text_caps = update.message.text.upper()
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
+        ai_args = {"input": update.message.text}
+        result = self.app.ai.invoke(ai_args)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=result["output"])
 
     def create(self):
         return MessageHandler(filters.TEXT & (~filters.COMMAND), self.handle)
