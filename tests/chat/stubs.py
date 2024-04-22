@@ -1,17 +1,20 @@
 import asyncio
 from chat.chatbase import ChatBase
+from models.command_base import CommandBase
 
 class EmptyChatStub(ChatBase):
     filters = {"message": "msg"}
     has_called_add_handler = False
     has_run = False
+
+    handlers = {}
     
     def __init__(self):
         pass
 
-    def add_handler(self, name: str, handler):
+    def add_handler(self, command: CommandBase):
         self.has_called_add_handler = True
-        return super().add_handler(name, handler)
+        self.handlers[command.name] = command.handle
     
     def run(self):
         self.has_run = True

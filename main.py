@@ -34,8 +34,8 @@ def main():
     
     app = builder.build_app()
 
-    app.add_message_handler(MessageCommand(app))
-    app.add_command_handler(ResetCommand('reset'))
+    app.add_command(MessageCommand(app))
+    app.add_command(ResetCommand('reset'))
 
     app.run()
 

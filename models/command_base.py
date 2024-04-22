@@ -4,3 +4,6 @@ class CommandBase:
 
     async def handle(self, **kwargs):
         pass
+
+    def create(self):
+        pass

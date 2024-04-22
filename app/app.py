@@ -20,11 +20,8 @@ class AyanamiApp():
     def __reset_handler__(self):
         self.ai.reset()
 
-    def add_command_handler(self, command: CommandBase):
-        self.chat.add_command_handler(command)
-
-    def add_message_handler(self, command: CommandBase):
-        self.chat.add_message_handler(command)
+    def add_command(self, command: CommandBase):
+        self.chat.add_handler(command)
 
     def run(self):
         self.ai.run()
