@@ -8,3 +8,14 @@ class EmptyAIStub(AIInterface):
 
     def run(self):
         self.has_run = True
+
+class ConstantAIStub(AIInterface):
+    def __init__(self, constant):
+        self.constant = constant
+        super().__init__()
+
+    def run(self):
+        pass
+
+    def invoke(self, args):
+        return {"input": args["input"], "output": self.constant}
