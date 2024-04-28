@@ -1,13 +1,13 @@
 import os
+from ai.langchain_factory import LangChainAIFactory
 from app.app_builder import AyanamiAppBuilder
-from app.commands import MessageCommand, ResetCommand
+from app.commands import MessageCommand, ResetCommand, PingCommand
 import app.tools_loader as tools_loader
 
 from auth.token_auth import TokenAuth
 
 from chat.telegramchat_factory import TelegramChatFactory
 import config
-from tests.ai.stubs import EmptyAIStub
 
 import logging
 
@@ -17,7 +17,7 @@ logging.basicConfig(
         )
 
 config_tools = config.tools
-config_ai_params = config.ai_model
+config_ai_params = config.ai_params
 
 def main():
     builder = AyanamiAppBuilder()
@@ -25,9 +25,8 @@ def main():
     chat = TelegramChatFactory().create(os.environ["TELEGRAM_BOT_TOKEN"])
     builder.set_chat(chat)
 
-    #ai_tools = tools_loader.load_tools(config_tools)
-    #ai = LangChainAIFactory().create(ai_tools, config_ai_params)
-    ai = EmptyAIStub()
+    ai_tools = tools_loader.load_tools(config_tools)
+    ai = LangChainAIFactory().create(ai_tools, config_ai_params)
     builder.set_ai(ai)
     
     #builder.add_auth(TokenAuth())
@@ -35,7 +34,8 @@ def main():
     app = builder.build_app()
 
     app.add_command(MessageCommand(app))
-    app.add_command(ResetCommand('reset'))
+    app.add_command(ResetCommand('reset', app))
+    app.add_command(PingCommand('ping', app))
 
     app.run()
 
