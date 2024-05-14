@@ -1,7 +1,7 @@
 import os
 from ai.langchain_factory import LangChainAIFactory
 from app.app_builder import AyanamiAppBuilder
-from app.commands import MessageCommand, ResetCommand, PingCommand, ImageCommand
+from app.commands import ChangeAICommand, MessageCommand, ResetCommand, PingCommand, ImageCommand
 import app.tools_loader as tools_loader
 
 from auth.token_auth import TokenAuth
@@ -17,7 +17,7 @@ logging.basicConfig(
         )
 
 config_tools = config.tools
-config_ai_params = config.ai_params
+config_ai_params = config.default_ai_params
 
 def main():
     builder = AyanamiAppBuilder()
@@ -37,6 +37,7 @@ def main():
     app.add_command(ImageCommand(app))
     app.add_command(ResetCommand('reset', app))
     app.add_command(PingCommand('ping', app))
+    app.add_command(ChangeAICommand('switch_ai', app, config.available_ai))
 
     app.run()
 

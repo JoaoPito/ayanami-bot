@@ -83,6 +83,38 @@ class PingCommand(CommandBase):
         await context.bot.send_message(chat_id=update.effective_chat.id, 
                                        text="pong", 
                                        connect_timeout=60)
+        
+    def create(self):
+        return CommandHandler(self.name, self.handle)
+
+class ChangeAICommand(CommandBase):
+    def __init__(self, name, app: AyanamiApp, config):
+        super().__init__(name,)
+        self.app = app
+        self.available_ai = config
+
+    async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        args = context.args
+        try:
+            model = args[0].lower()
+            temp = 0
+            system = ''
+            self.app.ai.set_ai_model(self.available_ai[model])
+            print(f"args: {args}  len: {len(args)}")
+            if len(args) > 1:
+                temp = float(args[1])
+                self.app.ai.set_ai_temp(temp)
+            if len(args) > 2:
+                system = args[2]
+                self.app.ai.set_ai_system(system)
+            await context.bot.send_message(chat_id=update.effective_chat.id, 
+                                       text=f"Updated AI with model '{self.available_ai[model]}', temp {temp} and system prompt '{system}'", 
+                                       connect_timeout=60)
+        except Exception as exc:
+            await context.bot.send_message(chat_id=update.effective_chat.id, 
+                                       text=f"Error setting AI parameters. Are your arguments correct?", 
+                                       connect_timeout=60)
+            raise exc
 
     def create(self):
         return CommandHandler(self.name, self.handle)

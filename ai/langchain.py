@@ -8,18 +8,23 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 MEMORY_KEY = 'chat_history'
 
+PARAM_MODEL = "ai_model"
+PARAM_TEMP = "temperature"
+PARAM_SYSTEM = "system"
+
 class LangChainAI(AIInterface):
     chat_history = []
 
     def __init__(self, tools, params):
         self.tools = tools
+        self.default_params = params
         self.__set_llm__(params)
         self.prompt = self.__create_prompt__()
 
     def __set_llm__(self, params):
-        self.model = params["ai_model"]
-        self.temperature = params["temperature"]
-        self.system_prompt = params["system"]
+        self.model = params[PARAM_MODEL]
+        self.temperature = params[PARAM_TEMP]
+        self.system_prompt = params[PARAM_SYSTEM]
         self.llm = ChatOpenAI(model=self.model, temperature=self.temperature).bind_tools(self.tools)
         
     def __create_prompt__(self):
@@ -86,5 +91,17 @@ class LangChainAI(AIInterface):
     def run(self):
         pass
 
-    def set_ai_params(self, params):
-        self.__set_llm__(params)
+    def set_ai_model(self, model: str):
+        new_params = self.default_params
+        new_params[PARAM_MODEL] = model
+        self.__set_llm__(new_params)
+
+    def set_ai_temp(self, temperature: float):
+        new_params = self.default_params
+        new_params[PARAM_TEMP] = temperature
+        self.__set_llm__(new_params)
+
+    def set_ai_system(self, system: str):
+        new_params = self.default_params
+        new_params[PARAM_SYSTEM] = system
+        self.__set_llm__(new_params)
