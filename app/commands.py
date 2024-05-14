@@ -22,7 +22,7 @@ class MessageCommand(CommandBase):
         return MessageHandler(filters.TEXT & (~filters.COMMAND), self.handle)
     
 class ImageCommand(CommandBase):
-    IMAGE_FILEPATH = "./downloaded/photos/{}"
+    IMAGE_FILEPATH = "./downloaded/photos/"
 
     def __init__(self, app: AyanamiApp):
         super().__init__("msg",)
@@ -40,11 +40,16 @@ class ImageCommand(CommandBase):
                                        text=result["output"], 
                                        connect_timeout=60)
         
+    def __prepare_image_path__(self, directory, filename):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        return directory + filename
+        
     async def __download_image_from_chat(self, message, bot):
         file_id = message.photo[-1].file_id
         file = await bot.get_file(file_id)
         current_time_str = datetime.datetime.now().strftime('%d%m%Y_%H%M%S')
-        filepath = self.IMAGE_FILEPATH.format(f"{current_time_str}_{os.path.basename(file.file_path)}")
+        filepath = self.__prepare_image_path__(self.IMAGE_FILEPATH, f"{current_time_str}_{os.path.basename(file.file_path)}")
         await file.download_to_drive(custom_path=filepath)
         return filepath
 
