@@ -1,7 +1,8 @@
 import os
 from ai.langchain_factory import LangChainAIFactory
 from app.app_builder import AyanamiAppBuilder
-from app.commands import ChangeAICommand, MessageCommand, ResetCommand, PingCommand, ImageCommand
+from app.commands.ai_commands import ChangeAICommand, ImageCommand, MessageCommand, ResetCommand
+from app.commands.app_commands import PingCommand
 import app.tools_loader as tools_loader
 
 from auth.token_auth import TokenAuth
@@ -29,7 +30,7 @@ def main():
     ai = LangChainAIFactory().create(ai_tools, config_ai_params)
     builder.set_ai(ai)
     
-    #builder.add_auth(TokenAuth())
+    builder.add_auth(TokenAuth())
     
     app = builder.build_app()
 
