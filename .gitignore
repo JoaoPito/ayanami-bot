@@ -161,3 +161,4 @@ cython_debug/
 
 start.sh
 setup.sh
+downloaded/
