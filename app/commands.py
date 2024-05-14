@@ -10,13 +10,14 @@ class MessageCommand(CommandBase):
     def __init__(self, app: AyanamiApp):
         super().__init__("msg",)
         self.app = app
+        self.chat = app.chat
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        ai_args = {"input_text": update.message.text, "username": update.message.from_user.first_name}
-        result = self.app.ai.invoke(ai_args)
-        await context.bot.send_message(chat_id=update.effective_chat.id, 
-                                       text=result["output"], 
-                                       connect_timeout=60)
+        user = update.message.from_user
+        if user != None and self.app.is_authorized(user.id):
+            ai_args = {"input_text": update.message.text, "username": update.message.from_user.first_name}
+            result = self.app.ai.invoke(ai_args)
+            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=result["output"])
 
     def create(self):
         return MessageHandler(filters.TEXT & (~filters.COMMAND), self.handle)
@@ -29,16 +30,16 @@ class ImageCommand(CommandBase):
         self.app = app
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        image_url = await self.__download_image_from_chat(update.message, context.bot)
-        text = update.message.caption
-        base64_image = self.__encode_image__(image_url)
+        user = update.message.from_user
+        if user != None and self.app.is_authorized(user.id):
+            image_url = await self.__download_image_from_chat(update.message, context.bot)
+            text = update.message.caption
+            base64_image = self.__encode_image__(image_url)
 
-        ai_args = {"input_text": text, "input_image": base64_image, "username": update.message.from_user.first_name}
+            ai_args = {"input_text": text, "input_image": base64_image, "username": update.message.from_user.first_name}
 
-        result = self.app.ai.invoke(ai_args)
-        await context.bot.send_message(chat_id=update.effective_chat.id, 
-                                       text=result["output"], 
-                                       connect_timeout=60)
+            result = self.app.ai.invoke(ai_args)
+            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=result["output"])
         
     def __prepare_image_path__(self, directory, filename):
         if not os.path.exists(directory):
@@ -66,10 +67,10 @@ class ResetCommand(CommandBase):
         self.app = app
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        self.app.ai.reset_history()
-        await context.bot.send_message(chat_id=update.effective_chat.id, 
-                                       text="Ok!", 
-                                       connect_timeout=60)
+        user = update.message.from_user
+        if user != None and self.app.is_authorized(user.id):
+            self.app.ai.reset_history()
+            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text="Ok!")
 
     def create(self):
         return CommandHandler(self.name, self.handle)
@@ -80,9 +81,9 @@ class PingCommand(CommandBase):
         self.app = app
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await context.bot.send_message(chat_id=update.effective_chat.id, 
-                                       text="pong", 
-                                       connect_timeout=60)
+        user = update.message.from_user
+        if user != None and self.app.is_authorized(user.id):
+            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text="pong")
         
     def create(self):
         return CommandHandler(self.name, self.handle)
@@ -93,28 +94,33 @@ class ChangeAICommand(CommandBase):
         self.app = app
         self.available_ai = config
 
+    def __get_params_from_args__(self, args):
+        model = args[0].lower()
+        temp = 0
+        system = ''
+        self.app.ai.set_ai_model(self.available_ai[model])
+        if len(args) > 1:
+            temp = float(args[1])
+            self.app.ai.set_ai_temp(temp)
+        if len(args) > 2:
+            system = args[2]
+            self.app.ai.set_ai_system(system)
+        return model, temp, system
+
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        args = context.args
-        try:
-            model = args[0].lower()
-            temp = 0
-            system = ''
-            self.app.ai.set_ai_model(self.available_ai[model])
-            print(f"args: {args}  len: {len(args)}")
-            if len(args) > 1:
-                temp = float(args[1])
-                self.app.ai.set_ai_temp(temp)
-            if len(args) > 2:
-                system = args[2]
-                self.app.ai.set_ai_system(system)
-            await context.bot.send_message(chat_id=update.effective_chat.id, 
-                                       text=f"Updated AI with model '{self.available_ai[model]}', temp {temp} and system prompt '{system}'", 
-                                       connect_timeout=60)
-        except Exception as exc:
-            await context.bot.send_message(chat_id=update.effective_chat.id, 
-                                       text=f"Error setting AI parameters. Are your arguments correct?", 
-                                       connect_timeout=60)
-            raise exc
+        user = update.message.from_user
+        if user != None and self.app.is_authorized(user.id):
+            args = context.args
+            model, temp, system = self.__get_params_from_args__(args)
+            try:
+                await self.chat.send_message(context=context, 
+                                            chat_id=update.effective_chat.id,
+                                            text=f"Updated AI with model '{self.available_ai[model]}', temp {temp} and system prompt '{system}'")
+            except Exception as exc:
+                await self.chat.send_message(context=context, 
+                                            chat_id=update.effective_chat.id,
+                                            text=f"Error setting AI parameters. Are your arguments correct?")
+                raise exc
 
     def create(self):
         return CommandHandler(self.name, self.handle)
