@@ -1,17 +1,14 @@
 from sqlalchemy import create_engine, Column, Integer
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import sessionmaker
+
+from data.table_interface import TableInterface
 
 class SQLiteTableBase(TableInterface):
-    conn = None
-    tablename = None
     Table = None
-    Base = declarative_base()
-
-    class EntityBase(Base):
-        __tablename__ = None
-        id = Column(Integer, primary_key=True)
     
-    def __init__(self, db_path):
+    def __init__(self, table, db_path, db_base):
+        self.Base = db_base
+        self.Table = table
         self.db_path = db_path
         self.engine = create_engine(f"sqlite:///{self.db_path}", echo=True)
         self.__create_table__();
