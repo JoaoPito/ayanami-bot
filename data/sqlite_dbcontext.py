@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.orm import sessionmaker
 
-from data.table_interface import TableInterface
+from data.db_interface import DBInterface
 
-class SQLiteTableBase(TableInterface):
+class SQLiteDBContext(DBInterface):
     Table = None
     
     def __init__(self, table, db_path, db_base):
@@ -22,7 +22,10 @@ class SQLiteTableBase(TableInterface):
         self.commit()
 
     def get_all(self):
-        return self.session.query(self.Table)
+        return self.session.query(self.Table).all()
+    
+    def get_with(self, criteria):
+        return self.session.query(self).filter(criteria).first()
 
     def remove(self, entity):
         self.session.delete(entity)
