@@ -12,7 +12,7 @@ class EmptyAuthStub(AuthInterface):
 class RegisteredAuthStub(AuthInterface):
     registered = {}
 
-    def register_user(self, user_id: int):
+    def try_authorize_user(self, user_id: int):
         self.registered.append(user_id)
 
     def is_authorized(self, user_id: int):
