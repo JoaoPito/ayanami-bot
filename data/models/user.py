@@ -14,3 +14,13 @@ class User(Base):
         blocked = Column(Boolean, nullable=False)
         blocked_timestamp = Column(Integer, nullable=True)
         retries = Column(Integer, nullable=False)
+
+        def __str__(self):
+                return f"""\tID: {self.id}
+                \tUser ID: {self.user_id}
+                \tLast Modified: {self.last_modified}
+                \tIs Authorized?: {self.authorized}
+                \tAuthorized Timestamp: {self.authorized_timestamp}
+                \tIs Blocked?: {self.blocked}
+                \tBlocked Timestamp: {self.blocked_timestamp}
+                \tRetries left: {self.retries}"""
