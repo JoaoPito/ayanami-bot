@@ -28,6 +28,7 @@ class ImageCommand(CommandBase):
     def __init__(self, app: AyanamiApp):
         super().__init__("msg",)
         self.app = app
+        self.chat = app.chat
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
@@ -65,6 +66,7 @@ class ResetCommand(CommandBase):
     def __init__(self, name, app: AyanamiApp):
         super().__init__(name,)
         self.app = app
+        self.chat = app.chat
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
@@ -79,6 +81,7 @@ class ChangeAICommand(CommandBase):
     def __init__(self, name, app: AyanamiApp, config):
         super().__init__(name,)
         self.app = app
+        self.chat = app.chat
         self.available_ai = config
 
     def __get_params_from_args__(self, args):
