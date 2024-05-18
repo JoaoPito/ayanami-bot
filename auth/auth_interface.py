@@ -10,3 +10,11 @@ class AuthInterface:
 
     def is_authorized(self, user_id: int):
         return False
+    
+    class ForbiddenError(Exception):
+        "Raised when User cannot have access to resource"
+        pass
+
+    class InvalidCriteriaError(Exception):
+        "Raised when given unexpected criteria for access"
+        pass
