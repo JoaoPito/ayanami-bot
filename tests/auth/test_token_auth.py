@@ -17,10 +17,16 @@ class TokenAuthTester(unittest.TestCase):
         return TokenAuth(db=self.table, config=config)
     
     def __generate_config__(self):
-        return {"token_size": 5, "retries": 10, "db_path": "./auth_test.db"}
+        return {"token_size": 5, "retries": 3, "db_path": "./auth_test.db"}
     
     def __get_user_from_DB__(self, user_id):
         return self.table.get_with(lambda u: u.user_id == user_id)
+    
+    def __try_authorize_user_ignoring_exceptions__(self, auth, user_id, token):
+        try:
+            auth.try_authorize_user(user_id, token)
+        except (AuthInterface.InvalidCriteriaError, AuthInterface.ForbiddenError):
+            pass
 
     def test_if_is_not_generating_empty_tokens(self):
         auth = self.__get_auth__()
@@ -59,10 +65,7 @@ class TokenAuthTester(unittest.TestCase):
         auth = self.__get_auth__()
         user_id = self.__get_random_user_id__()
         fake_token = "abcdefg"
-        try:
-            auth.try_authorize_user(user_id, fake_token)
-        except (AuthInterface.WrongCriteriaError, AuthInterface.ForbiddenError):
-            pass
+        self.__try_authorize_user_ignoring_exceptions__(auth, user_id, fake_token)
         db_result = self.__get_user_from_DB__(user_id)
         self.assertEqual(db_result.user_id, user_id, "Could not find user registered after giving wrong token")
 
@@ -72,16 +75,34 @@ class TokenAuthTester(unittest.TestCase):
         token = auth.session_token
         try:
             auth.try_authorize_user(user_id, token)
-        except (AuthInterface.WrongCriteriaError, AuthInterface.ForbiddenError):
-            pass
+        except (AuthInterface.ForbiddenError, AuthInterface.InvalidCriteriaError):
+            self.fail("Auth raised exception when shouldn't")
         db_result = self.__get_user_from_DB__(user_id)
         self.assertEqual(db_result.user_id, user_id, "Could not find user registered after giving right token")
     
     def test_if_is_decrementing_retries_after_wrong_token(self):
-        pass
+        auth = self.__get_auth__()
+        user_id = self.__get_random_user_id__()
+        auth.register_new_user(user_id)
+
+        user = self.__get_user_from_DB__(user_id)
+        self.assertEqual(user.retries, auth.max_retries, "Auth did not register new user with max retries")
+
+        fake_token = "abcdefg"
+        self.__try_authorize_user_ignoring_exceptions__(auth, user_id, fake_token)
+        self.assertEqual(user.retries, auth.max_retries-1, "Auth did not decrement retries")
     
     def test_if_is_resetting_retries_after_right_token(self):
-        pass
+        auth = self.__get_auth__()
+        user_id = self.__get_random_user_id__()
+        auth.register_new_user(user_id)
+        user = self.__get_user_from_DB__(user_id)
+        fake_token = "abcdefg"
+        real_token = auth.session_token
+        self.__try_authorize_user_ignoring_exceptions__(auth, user_id, fake_token)
+        auth.try_authorize_user(user_id, real_token)
+        expected_retries = auth.max_retries
+        self.assertEqual(user.retries, expected_retries, "Auth did not reset retries after successful login")
 
     def test_if_is_restricting_unauthorized_users(self):
         user_id = self.__get_random_user_id__()
@@ -96,10 +117,28 @@ class TokenAuthTester(unittest.TestCase):
         self.assertTrue(auth.is_authorized(user_id))
 
     def test_if_raises_exception_when_given_wrong_token(self):
-        pass
+        auth = self.__get_auth__()
+        user_id = self.__get_random_user_id__()
+        auth.register_new_user(user_id)
+        fake_token = "abcdefg"
+        try:
+            auth.try_authorize_user(user_id, fake_token)
+        except Exception as exc:
+            self.assertIsInstance(exc, AuthInterface.InvalidCriteriaError, "Exception raised was not of correct type")
+        else:
+            self.fail("TokenAuth did not raise exception when should have")
 
     def test_if_blocks_user_when_runs_out_of_retries(self):
-        pass
+        auth = self.__get_auth__()
+        user_id = self.__get_random_user_id__()
+        auth.register_new_user(user_id)
+        token = "abcdefg"
+        for i in range(auth.max_retries):
+            self.__try_authorize_user_ignoring_exceptions__(auth, user_id, token)
+        try:
+            auth.try_authorize_user(user_id, token)
+        except Exception as exc:
+            self.assertIsInstance(exc, AuthInterface.ForbiddenError, "Exception raised was not of correct type")
+        else:
+            self.fail("TokenAuth did not raise exception when should have")
 
-    def test_if_is_allowing_registered_users(self):
-        pass
