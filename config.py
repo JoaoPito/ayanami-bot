@@ -9,6 +9,7 @@ default_ai_params = {
 
 # Enable/disable tools that the AI can use here
 tools = {"tools.word_length", "tools.youtube", "tools.wikipedia", "tools.openweathermap", "tools.googlesearch"} 
+toolkits = {"tools.filesystemtoolkit"}
 
 # You can switch between the models defined here with /switch_ai:
 available_ai = {

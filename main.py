@@ -21,6 +21,7 @@ logging.basicConfig(
         )
 
 config_tools = config.tools
+config_toolkits = config.toolkits
 config_ai_params = config.default_ai_params
 config_auth = config.auth_config
 
@@ -30,7 +31,7 @@ def main():
     chat = TelegramChatFactory().create(os.environ["TELEGRAM_BOT_TOKEN"])
     builder.set_chat(chat)
 
-    ai_tools = tools_loader.load_tools(config_tools)
+    ai_tools = tools_loader.load_tools_and_toolkits(config_tools, config_toolkits)
     ai = LangChainAIFactory().create(ai_tools, config_ai_params)
     builder.set_ai(ai)
     
