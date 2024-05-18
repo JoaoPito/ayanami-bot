@@ -163,3 +163,4 @@ start.sh
 setup.sh
 downloaded/
 *.db
+shared_files/
