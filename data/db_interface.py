@@ -1,3 +1,4 @@
+
 class DBInterface():
     def insert(self, entity):
         pass
