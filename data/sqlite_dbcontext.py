@@ -10,7 +10,7 @@ class SQLiteDBContext(DBInterface):
         self.Base = db_base
         self.Table = table
         self.db_path = db_path
-        self.engine = create_engine(f"sqlite:///{self.db_path}", echo=True)
+        self.engine = create_engine(f"sqlite:///{self.db_path}", echo=False)
         self.__create_table__();
         self.session = sessionmaker(bind=self.engine)()
 
@@ -25,7 +25,7 @@ class SQLiteDBContext(DBInterface):
         return self.session.query(self.Table).all()
     
     def get_with(self, criteria):
-        return self.session.query(self).filter(criteria).first()
+        return self.session.query(self.Table).filter(criteria(self.Table)).first()
 
     def remove(self, entity):
         self.session.delete(entity)
