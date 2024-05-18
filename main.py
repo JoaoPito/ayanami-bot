@@ -2,7 +2,7 @@ import os
 from ai.langchain_factory import LangChainAIFactory
 from app.app_builder import AyanamiAppBuilder
 from app.commands.ai_commands import ChangeAICommand, ImageCommand, MessageCommand, ResetCommand
-from app.commands.app_commands import PingCommand
+from app.commands.app_commands import PingCommand, StartCommand
 from app.commands.auth_commands import RegisterUserCommand, TryAuthenticateUserCommand
 import app.tools_loader as tools_loader
 
@@ -34,7 +34,7 @@ def main():
     ai = LangChainAIFactory().create(ai_tools, config_ai_params)
     builder.set_ai(ai)
     
-    auth = TokenAuth(create_dbcontext(), config_auth)
+    auth = TokenAuth(create_dbcontext(path="./users.db"), config_auth)
     builder.set_authenticator(auth)
     
     app = builder.build_app()
@@ -49,7 +49,7 @@ def main():
     app.add_command(PingCommand('ping', app))
 
     # Auth commands
-    app.add_command(RegisterUserCommand('start', app))
+    app.add_command(StartCommand('start', app))
     app.add_command(TryAuthenticateUserCommand('auth', app))
 
     print(f"> IMPORTANT: This session token is: '{auth.session_token}', use it to authenticate with /auth TOKEN.")
