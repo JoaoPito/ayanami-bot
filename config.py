@@ -13,3 +13,10 @@ available_ai = {
     "gpt3": "gpt-3.5-turbo",
     "gpt4o": "gpt-4o"
 }
+
+# Token Authorization config
+auth_config = {
+    "token_size": 5,
+    "retries": 10,
+    "db_path": "./auth.db"
+}
