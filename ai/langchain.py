@@ -8,51 +8,53 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 MEMORY_KEY = 'chat_history'
 
+PARAM_MODEL = "ai_model"
+PARAM_TEMP = "temperature"
+PARAM_SYSTEM = "system"
+
 class LangChainAI(AIInterface):
     chat_history = []
 
     def __init__(self, tools, params):
-        self.model = params["ai_model"]
-        self.temperature = params["temperature"]
-        self.system_prompt = params["system"]
         self.tools = tools
-        self.llm = ChatOpenAI(model=self.model, temperature=self.temperature).bind_tools(tools)
+        self.default_params = params
+        self.__set_llm__(params)
         self.prompt = self.__create_prompt__()
-        self.agent_executor = AgentExecutor(agent=self.__create_agent__(), tools=tools, verbose=True)
+
+    def __set_llm__(self, params):
+        self.model = params[PARAM_MODEL]
+        self.temperature = params[PARAM_TEMP]
+        self.system_prompt = params[PARAM_SYSTEM]
+        self.llm = ChatOpenAI(model=self.model, temperature=self.temperature).bind_tools(self.tools)
         
     def __create_prompt__(self):
         return ChatPromptTemplate.from_messages(
         [
-            (
-                "system",
-                self.system_prompt,
-            ),
+            ("system", self.system_prompt),
             MessagesPlaceholder(variable_name=MEMORY_KEY), # history of messages, stays ABOVE user input
-            ("user", "{input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad"), # This serves to store tools results so that the LLM can use
         ]
         )
     
-    def __create_agent__(self):
+    def __create_agent__(self, human_message):
+        complete_prompt = self.prompt + [human_message, MessagesPlaceholder(variable_name="agent_scratchpad")]
         return (
             {
-                "input": lambda x: x["input"],
                 "username": lambda x: x["username"],
                 "agent_scratchpad": lambda x: format_to_openai_tool_messages(
                     x['intermediate_steps']
                 ),
                 MEMORY_KEY: lambda x: x[MEMORY_KEY],
             }
-            | self.prompt
+            | complete_prompt
             | self.llm
             | OpenAIToolsAgentOutputParser()
         )
 
-    def __add_to_history__(self, input, result):
+    def __add_to_history__(self, human_msg, ai_response):
         self.chat_history.extend(
             [
-                HumanMessage(content=input),
-                AIMessage(content=result['output'],)
+                human_msg,
+                ai_response
             ]
         )
         self.chat_history = self.chat_history[-20:]
@@ -60,10 +62,26 @@ class LangChainAI(AIInterface):
     def __persist_history_log__(self):
         pass # Persist log to a file or DB
 
+    def __create_human_message__(self, args):
+        input_text = args["input_text"]
+        humanmessage_content = [
+                {"type": "text", "text": f"{input_text}"}
+            ]
+        
+        if "input_image" in args:
+            input_image = args["input_image"]
+            humanmessage_content.append({"type": "image_url", "image_url": {
+                    "url": f"data:image/jpeg;base64,{input_image}"
+                }})
+        return HumanMessage(content=humanmessage_content)
+
     def invoke(self, args):
         args[MEMORY_KEY] = self.chat_history
-        result = self.agent_executor.invoke(args)
-        self.__add_to_history__(args["input"], result)
+        human_message = self.__create_human_message__(args)
+        agent_executor = AgentExecutor(agent=self.__create_agent__(human_message), tools=self.tools, verbose=True)
+
+        result = agent_executor.invoke(args)
+        self.__add_to_history__(human_message, AIMessage(content=result['output'],))
         self.__persist_history_log__()
         return result
     
@@ -72,3 +90,18 @@ class LangChainAI(AIInterface):
     
     def run(self):
         pass
+
+    def set_ai_model(self, model: str):
+        new_params = self.default_params
+        new_params[PARAM_MODEL] = model
+        self.__set_llm__(new_params)
+
+    def set_ai_temp(self, temperature: float):
+        new_params = self.default_params
+        new_params[PARAM_TEMP] = temperature
+        self.__set_llm__(new_params)
+
+    def set_ai_system(self, system: str):
+        new_params = self.default_params
+        new_params[PARAM_SYSTEM] = system
+        self.__set_llm__(new_params)

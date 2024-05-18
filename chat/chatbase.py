@@ -12,3 +12,6 @@ class ChatBase:
 
     def stop(self):
         pass
+
+    async def send_message(self):
+        pass
