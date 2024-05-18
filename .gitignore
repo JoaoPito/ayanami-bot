@@ -164,3 +164,4 @@ setup.sh
 downloaded/
 auth_test.db
 app.db
+users.db
