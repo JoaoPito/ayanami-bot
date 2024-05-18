@@ -52,7 +52,7 @@ def main():
     app.add_command(StartCommand('start', app))
     app.add_command(TryAuthenticateUserCommand('auth', app))
 
-    print(f"> IMPORTANT: This session token is: '{auth.session_token}', use it to authenticate with '/auth TOKEN.'")
+    logging.info(f"> IMPORTANT: This session token is: '{auth.session_token}', use it to authenticate with '/auth TOKEN.'")
 
     app.run()
 
