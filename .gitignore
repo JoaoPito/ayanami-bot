@@ -162,6 +162,4 @@ cython_debug/
 start.sh
 setup.sh
 downloaded/
-auth_test.db
-app.db
-users.db
+*.db
