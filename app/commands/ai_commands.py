@@ -1,9 +1,7 @@
-import datetime
-import os
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, CommandHandler, filters
 from app.app import AyanamiApp
-from chat.multimedia.directory import create_if_not_exists, join_path_with_filename
+from chat.multimedia.files import download_file_from_id
 from chat.multimedia.images import load_using_base64
 from models.command_base import CommandBase
 
@@ -41,19 +39,11 @@ class ImageCommand(CommandBase):
             ai_args = {"input_text": text, "input_image": base64_image, "username": update.message.from_user.first_name}
             result = self.app.ai.invoke(ai_args)
             await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=result["output"])
-        
-    def __get_image_path__(self, original_filename, path=IMAGE_FILEPATH):
-        create_if_not_exists(path)
-        current_time_str = datetime.datetime.now().strftime('%d%m%Y_%H%M%S')
-        filename = f"{current_time_str}_{os.path.basename(original_filename)}"
-        return join_path_with_filename(self.IMAGE_FILEPATH, filename)
 
     async def __download_image_from_chat__(self, message, bot):
         file_id = message.photo[-1].file_id
-        file = await bot.get_file(file_id)
-        full_path = self.__get_image_path__(file.file_path)
-        await file.download_to_drive(custom_path=full_path)
-        return full_path
+        path = await download_file_from_id(bot, file_id, self.IMAGE_FILEPATH)
+        return path
 
     def create(self):
         return MessageHandler(filters.PHOTO & (~filters.COMMAND), self.handle)
