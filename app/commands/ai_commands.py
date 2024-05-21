@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, CommandHandler, filters
 from app.app import AyanamiApp
-from chat.multimedia.files import download_file_from_id
+from chat.multimedia.files import download_attachment_from_message, download_file_from_id
 from chat.multimedia.images import load_using_base64
 from models.command_base import CommandBase
 
@@ -59,8 +59,7 @@ class DocumentCommand(CommandBase):
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
         if user != None and self.app.is_authorized(user.id):
-            file_id = update.message.document.file_id
-            path = await download_file_from_id(context.bot, file_id, self.DOWNLOAD_PATH)
+            path = await download_attachment_from_message(update.message, self.DOWNLOAD_PATH)
             
             await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=f"Downloaded to \"{path}\"!")
 
