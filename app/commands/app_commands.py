@@ -7,6 +7,7 @@ class PingCommand(CommandBase):
     def __init__(self, name, app: AyanamiApp):
         super().__init__(name,)
         self.app = app
+        self.chat = app.chat
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user

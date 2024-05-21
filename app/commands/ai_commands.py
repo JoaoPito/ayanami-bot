@@ -1,10 +1,9 @@
-import datetime
-import os
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, CommandHandler, filters
 from app.app import AyanamiApp
+from chat.multimedia.files import download_file_from_id
+from chat.multimedia.images import load_using_base64
 from models.command_base import CommandBase
-import base64
 
 class MessageCommand(CommandBase):
     def __init__(self, app: AyanamiApp):
@@ -28,35 +27,23 @@ class ImageCommand(CommandBase):
     def __init__(self, app: AyanamiApp):
         super().__init__("msg",)
         self.app = app
+        self.chat = app.chat
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
         if user != None and self.app.is_authorized(user.id):
-            image_url = await self.__download_image_from_chat(update.message, context.bot)
+            image_url = await self.__download_image_from_chat__(update.message, context.bot)
+            base64_image = load_using_base64(image_url)
             text = update.message.caption
-            base64_image = self.__encode_image__(image_url)
 
             ai_args = {"input_text": text, "input_image": base64_image, "username": update.message.from_user.first_name}
-
             result = self.app.ai.invoke(ai_args)
             await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=result["output"])
-        
-    def __prepare_image_path__(self, directory, filename):
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        return directory + filename
-        
-    async def __download_image_from_chat(self, message, bot):
-        file_id = message.photo[-1].file_id
-        file = await bot.get_file(file_id)
-        current_time_str = datetime.datetime.now().strftime('%d%m%Y_%H%M%S')
-        filepath = self.__prepare_image_path__(self.IMAGE_FILEPATH, f"{current_time_str}_{os.path.basename(file.file_path)}")
-        await file.download_to_drive(custom_path=filepath)
-        return filepath
 
-    def __encode_image__(self, image_url):
-        with open(image_url, "rb") as f:
-            return base64.b64encode(f.read()).decode('utf-8')
+    async def __download_image_from_chat__(self, message, bot):
+        file_id = message.photo[-1].file_id
+        path = await download_file_from_id(bot, file_id, self.IMAGE_FILEPATH)
+        return path
 
     def create(self):
         return MessageHandler(filters.PHOTO & (~filters.COMMAND), self.handle)
@@ -65,6 +52,7 @@ class ResetCommand(CommandBase):
     def __init__(self, name, app: AyanamiApp):
         super().__init__(name,)
         self.app = app
+        self.chat = app.chat
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
@@ -79,6 +67,7 @@ class ChangeAICommand(CommandBase):
     def __init__(self, name, app: AyanamiApp, config):
         super().__init__(name,)
         self.app = app
+        self.chat = app.chat
         self.available_ai = config
 
     def __get_params_from_args__(self, args):

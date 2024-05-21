@@ -1,7 +1,6 @@
 from chat.chatbase import ChatBase
+from chat.multimedia.text import split_phrases
 from models.command_base import CommandBase
-
-from telegram.ext import CommandHandler, MessageHandler, filters
 
 class TelegramChat(ChatBase):
     def __init__(self, telegram_app):
@@ -14,7 +13,9 @@ class TelegramChat(ChatBase):
     def run(self):
         self.telegram_app.run_polling()
 
-    async def send_message(self, context, chat_id, text, connect_timeout=60):
-        await context.bot.send_message(chat_id=chat_id, 
-                                       text=text, 
-                                       connect_timeout=connect_timeout)
+    async def send_message(self, context, chat_id, text, connect_timeout=60, max_chars=4096):
+        text_pieces = split_phrases(text, max_chars=max_chars)
+        for piece in text_pieces:
+            await context.bot.send_message(chat_id=chat_id, 
+                                            text=piece, 
+                                            connect_timeout=connect_timeout)
