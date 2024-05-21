@@ -3,8 +3,9 @@ import os
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, CommandHandler, filters
 from app.app import AyanamiApp
+from chat.multimedia.directory import create_if_not_exists, join_path_with_filename
+from chat.multimedia.images import load_using_base64
 from models.command_base import CommandBase
-import base64
 
 class MessageCommand(CommandBase):
     def __init__(self, app: AyanamiApp):
@@ -33,31 +34,26 @@ class ImageCommand(CommandBase):
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
         if user != None and self.app.is_authorized(user.id):
-            image_url = await self.__download_image_from_chat(update.message, context.bot)
+            image_url = await self.__download_image_from_chat__(update.message, context.bot)
+            base64_image = load_using_base64(image_url)
             text = update.message.caption
-            base64_image = self.__encode_image__(image_url)
 
             ai_args = {"input_text": text, "input_image": base64_image, "username": update.message.from_user.first_name}
-
             result = self.app.ai.invoke(ai_args)
             await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=result["output"])
         
-    def __prepare_image_path__(self, directory, filename):
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        return directory + filename
-        
-    async def __download_image_from_chat(self, message, bot):
+    def __get_image_path__(self, original_filename, path=IMAGE_FILEPATH):
+        create_if_not_exists(path)
+        current_time_str = datetime.datetime.now().strftime('%d%m%Y_%H%M%S')
+        filename = f"{current_time_str}_{os.path.basename(original_filename)}"
+        return join_path_with_filename(self.IMAGE_FILEPATH, filename)
+
+    async def __download_image_from_chat__(self, message, bot):
         file_id = message.photo[-1].file_id
         file = await bot.get_file(file_id)
-        current_time_str = datetime.datetime.now().strftime('%d%m%Y_%H%M%S')
-        filepath = self.__prepare_image_path__(self.IMAGE_FILEPATH, f"{current_time_str}_{os.path.basename(file.file_path)}")
-        await file.download_to_drive(custom_path=filepath)
-        return filepath
-
-    def __encode_image__(self, image_url):
-        with open(image_url, "rb") as f:
-            return base64.b64encode(f.read()).decode('utf-8')
+        full_path = self.__get_image_path__(file.file_path)
+        await file.download_to_drive(custom_path=full_path)
+        return full_path
 
     def create(self):
         return MessageHandler(filters.PHOTO & (~filters.COMMAND), self.handle)
