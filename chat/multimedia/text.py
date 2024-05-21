@@ -2,7 +2,7 @@ import re
 
 def split_phrases(raw_text, max_chars):
     phrases_idx = []
-    for match in re.finditer('.*?[.!\?]', raw_text, flags=re.DOTALL):
+    for match in re.finditer('.*?[.!?]', raw_text, flags=re.DOTALL):
         phrases_idx.append((match.start(), match.end()))
     text_pieces = []
     cur_piece = ""
