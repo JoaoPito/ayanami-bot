@@ -22,7 +22,7 @@ class MessageCommand(CommandBase):
         return MessageHandler(filters.TEXT & (~filters.COMMAND), self.handle)
     
 class ImageCommand(CommandBase):
-    IMAGE_FILEPATH = "./downloaded/photos/"
+    DOWNLOAD_PATH = "./downloaded/photos/"
 
     def __init__(self, app: AyanamiApp):
         super().__init__("msg",)
@@ -42,11 +42,30 @@ class ImageCommand(CommandBase):
 
     async def __download_image_from_chat__(self, message, bot):
         file_id = message.photo[-1].file_id
-        path = await download_file_from_id(bot, file_id, self.IMAGE_FILEPATH)
+        path = await download_file_from_id(bot, file_id, self.DOWNLOAD_PATH)
         return path
 
     def create(self):
         return MessageHandler(filters.PHOTO & (~filters.COMMAND), self.handle)
+    
+class DocumentCommand(CommandBase):
+    DOWNLOAD_PATH = "./downloaded/documents/"
+
+    def __init__(self, app: AyanamiApp):
+        super().__init__("msg",)
+        self.app = app
+        self.chat = app.chat
+
+    async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user = update.message.from_user
+        if user != None and self.app.is_authorized(user.id):
+            file_id = update.message.document.file_id
+            path = await download_file_from_id(context.bot, file_id, self.DOWNLOAD_PATH)
+            
+            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=f"Downloaded to \"{path}\"!")
+
+    def create(self):
+        return MessageHandler(filters.ATTACHMENT & (~filters.COMMAND & ~filters.PHOTO), self.handle)
 
 class ResetCommand(CommandBase):
     def __init__(self, name, app: AyanamiApp):
