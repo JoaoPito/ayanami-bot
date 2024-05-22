@@ -24,10 +24,11 @@ class MessageCommand(CommandBase):
 class ImageCommand(CommandBase):
     DOWNLOAD_PATH = "./downloaded/photos/"
 
-    def __init__(self, app: AyanamiApp):
+    def __init__(self, app: AyanamiApp, download_path=DOWNLOAD_PATH):
         super().__init__("msg",)
         self.app = app
         self.chat = app.chat
+        self.download_path = download_path
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
@@ -42,7 +43,7 @@ class ImageCommand(CommandBase):
 
     async def __download_image_from_chat__(self, message, bot):
         file_id = message.photo[-1].file_id
-        path = await download_file_from_id(bot, file_id, self.DOWNLOAD_PATH)
+        path = await download_file_from_id(bot, file_id, self.download_path)
         return path
 
     def create(self):
@@ -56,15 +57,16 @@ class DocumentCommand(CommandBase):
     {user_message}
     """
 
-    def __init__(self, app: AyanamiApp):
+    def __init__(self, app: AyanamiApp, download_path=DOWNLOAD_PATH):
         super().__init__("msg",)
         self.app = app
         self.chat = app.chat
+        self.download_path = download_path
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
         if user != None and self.app.is_authorized(user.id):
-            path = await download_attachment_from_message(update.message, self.DOWNLOAD_PATH)
+            path = await download_attachment_from_message(update.message, self.download_path)
             prompt = self.__insert_file_contents_into_prompt_using_template__(update.message.caption, self.__read_file_into_str__(path))
             ai_args = {"input_text": prompt, "username": update.message.from_user.first_name}
             result = self.app.ai.invoke(ai_args)
