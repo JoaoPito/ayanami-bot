@@ -21,7 +21,7 @@ async def download_attachment_from_message(message, path):
     filename = attachment.file_name
     full_path = join_path_with_filename(path, filename)
     await file.download_to_drive(custom_path=full_path)
-    return full_path
+    return full_path, filename
 
 async def download_file_from_id(bot, file_id, path):
     create_dir_if_not_exists(path)
@@ -29,4 +29,4 @@ async def download_file_from_id(bot, file_id, path):
     filename = get_filename_from_schema(file.file_path)
     full_path = join_path_with_filename(path, filename)
     await file.download_to_drive(custom_path=full_path)
-    return full_path
+    return full_path, filename

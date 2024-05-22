@@ -50,10 +50,10 @@ class ImageCommand(CommandBase):
         return MessageHandler(filters.PHOTO & (~filters.COMMAND), self.handle)
     
 class DocumentCommand(CommandBase):
-    DOWNLOAD_PATH = "./downloaded/documents/"
+    DOWNLOAD_PATH = "./shared_files/"
 
-    PROMPT_TEMPLATE = """file: \"{file_contents}\"
-    \n---\n
+    PROMPT_TEMPLATE = """sent file: {file_name}
+    \n\n
     {user_message}
     """
 
@@ -66,8 +66,10 @@ class DocumentCommand(CommandBase):
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
         if user != None and self.app.is_authorized(user.id):
-            path = await download_attachment_from_message(update.message, self.download_path)
-            prompt = self.__insert_file_contents_into_prompt_using_template__(update.message.caption, self.__read_file_into_str__(path))
+            path, filename = await download_attachment_from_message(update.message, self.download_path)
+            prompt = self.__insert_file_contents_into_prompt_using_template__(update.message.caption, 
+                                                                              self.__read_file_into_str__(path), 
+                                                                              file_name=filename)
             ai_args = {"input_text": prompt, "username": update.message.from_user.first_name}
             result = self.app.ai.invoke(ai_args)
             await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=result["output"])
@@ -76,8 +78,8 @@ class DocumentCommand(CommandBase):
         with open(path, 'r') as file:
             return file.read()
         
-    def __insert_file_contents_into_prompt_using_template__(self, prompt, file_contents):
-        return self.PROMPT_TEMPLATE.format(file_contents=file_contents, user_message=prompt)
+    def __insert_file_contents_into_prompt_using_template__(self, prompt, file_contents, file_name):
+        return self.PROMPT_TEMPLATE.format(file_contents=file_contents, user_message=prompt, file_name=file_name)
 
     def create(self):
         return MessageHandler(filters.ATTACHMENT & (~filters.COMMAND & ~filters.PHOTO), self.handle)
