@@ -51,6 +51,11 @@ class ImageCommand(CommandBase):
 class DocumentCommand(CommandBase):
     DOWNLOAD_PATH = "./downloaded/documents/"
 
+    PROMPT_TEMPLATE = """file: \"{file_contents}\"
+    \n---\n
+    {user_message}
+    """
+
     def __init__(self, app: AyanamiApp):
         super().__init__("msg",)
         self.app = app
@@ -60,8 +65,17 @@ class DocumentCommand(CommandBase):
         user = update.message.from_user
         if user != None and self.app.is_authorized(user.id):
             path = await download_attachment_from_message(update.message, self.DOWNLOAD_PATH)
-            
-            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=f"Downloaded to \"{path}\"!")
+            prompt = self.__insert_file_contents_into_prompt_using_template__(update.message.caption, self.__read_file_into_str__(path))
+            ai_args = {"input_text": prompt, "username": update.message.from_user.first_name}
+            result = self.app.ai.invoke(ai_args)
+            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=result["output"])
+
+    def __read_file_into_str__(self, path):
+        with open(path, 'r') as file:
+            return file.read()
+        
+    def __insert_file_contents_into_prompt_using_template__(self, prompt, file_contents):
+        return self.PROMPT_TEMPLATE.format(file_contents=file_contents, user_message=prompt)
 
     def create(self):
         return MessageHandler(filters.ATTACHMENT & (~filters.COMMAND & ~filters.PHOTO), self.handle)
