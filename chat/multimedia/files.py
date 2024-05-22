@@ -18,7 +18,7 @@ async def download_attachment_from_message(message, path):
     create_dir_if_not_exists(path)
     attachment = message.effective_attachment
     file = await attachment.get_file()
-    filename = get_filename_from_schema(attachment.file_name)
+    filename = attachment.file_name
     full_path = join_path_with_filename(path, filename)
     await file.download_to_drive(custom_path=full_path)
     return full_path
