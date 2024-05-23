@@ -1,3 +1,6 @@
+
+from telegram import Update
+
 from app.app import AyanamiApp
 from models.command_base import CommandBase
 from telegram import Update
@@ -8,7 +11,7 @@ class RegisterUserCommand(CommandBase):
         super().__init__(name,)
         self.app = app
 
-    async def handle(self, update: update, context: ContextTypes.DEFAULT_TYPE):
+    async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.message.from_user.id
         self.app.auth.register_new_user(user_id)
 
@@ -21,7 +24,7 @@ class TryAuthenticateUserCommand(CommandBase):
         self.app = app
         self.chat = app.chat
 
-    async def handle(self, update: update, context: ContextTypes.DEFAULT_TYPE):
+    async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
         if user != None and not self.app.is_authorized(user.id):
             input_token = context.args[0]
