@@ -7,6 +7,7 @@ from langchain.agents import AgentExecutor
 from langchain_core.messages import AIMessage, HumanMessage
 
 MEMORY_KEY = 'chat_history'
+TOOL_SCRATCHPAD_KEY = 'agent_scratchpad'
 
 PARAM_MODEL = "ai_model"
 PARAM_TEMP = "temperature"
@@ -36,11 +37,11 @@ class LangChainAI(AIInterface):
         )
     
     def __create_agent__(self, human_message):
-        complete_prompt = self.prompt + [human_message, MessagesPlaceholder(variable_name="agent_scratchpad")]
+        complete_prompt = self.prompt + [human_message, MessagesPlaceholder(variable_name=TOOL_SCRATCHPAD_KEY)]
         return (
             {
                 "username": lambda x: x["username"],
-                "agent_scratchpad": lambda x: format_to_openai_tool_messages(
+                TOOL_SCRATCHPAD_KEY: lambda x: format_to_openai_tool_messages(
                     x['intermediate_steps']
                 ),
                 MEMORY_KEY: lambda x: x[MEMORY_KEY],
@@ -67,12 +68,6 @@ class LangChainAI(AIInterface):
         humanmessage_content = [
                 {"type": "text", "text": f"{input_text}"}
             ]
-        
-        if "input_image" in args:
-            input_image = args["input_image"]
-            humanmessage_content.append({"type": "image_url", "image_url": {
-                    "url": f"data:image/jpeg;base64,{input_image}"
-                }})
         return HumanMessage(content=humanmessage_content)
 
     def invoke(self, args):
