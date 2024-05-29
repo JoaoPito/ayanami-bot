@@ -1,4 +1,3 @@
-from telegram import Update
 from app.app import AyanamiApp
 from auth.auth_interface import AuthInterface
 from models.command_base import CommandBase

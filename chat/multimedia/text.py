@@ -7,6 +7,8 @@ def split_phrases(raw_text, max_chars):
     text_pieces = []
     cur_piece = ""
 
+    end = 0
+
     for start,end in phrases_idx:
         phrase = raw_text[start:end]
         if len(cur_piece + phrase) <= max_chars:

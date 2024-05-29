@@ -1,7 +1,7 @@
 import os
 from ai.langchain_factory import LangChainAIFactory
 from app.app_builder import AyanamiAppBuilder
-from app.commands.ai_commands import ChangeAICommand, ImageCommand, MessageCommand, ResetCommand
+from app.commands.ai_commands import ChangeAICommand, DocumentCommand, ImageCommand, MessageCommand, ResetCommand
 from app.commands.app_commands import PingCommand, StartCommand
 from app.commands.auth_commands import RegisterUserCommand, TryAuthenticateUserCommand
 import app.tools_loader as tools_loader
@@ -43,6 +43,7 @@ def main():
     # AI commands
     app.add_command(MessageCommand(app))
     app.add_command(ImageCommand(app))
+    app.add_command(DocumentCommand(app))
     app.add_command(ResetCommand('reset', app))
     app.add_command(ChangeAICommand('switch_ai', app, config.available_ai))
 

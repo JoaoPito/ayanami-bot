@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, CommandHandler, filters
 from app.app import AyanamiApp
-from chat.multimedia.files import download_file_from_id
+from chat.multimedia.files import download_attachment_from_message, download_file_from_id
 from chat.multimedia.images import load_using_base64
 from models.command_base import CommandBase
 
@@ -22,12 +22,13 @@ class MessageCommand(CommandBase):
         return MessageHandler(filters.TEXT & (~filters.COMMAND), self.handle)
     
 class ImageCommand(CommandBase):
-    IMAGE_FILEPATH = "./downloaded/photos/"
+    DOWNLOAD_PATH = "./downloaded/photos/"
 
-    def __init__(self, app: AyanamiApp):
+    def __init__(self, app: AyanamiApp, download_path=DOWNLOAD_PATH):
         super().__init__("msg",)
         self.app = app
         self.chat = app.chat
+        self.download_path = download_path
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
@@ -42,11 +43,40 @@ class ImageCommand(CommandBase):
 
     async def __download_image_from_chat__(self, message, bot):
         file_id = message.photo[-1].file_id
-        path = await download_file_from_id(bot, file_id, self.IMAGE_FILEPATH)
+        path = await download_file_from_id(bot, file_id, self.download_path)
         return path
 
     def create(self):
         return MessageHandler(filters.PHOTO & (~filters.COMMAND), self.handle)
+    
+class DocumentCommand(CommandBase):
+    DOWNLOAD_PATH = "./shared_files/"
+
+    PROMPT_TEMPLATE = """sent file: {file_name}
+    \n\n
+    {user_message}
+    """
+
+    def __init__(self, app: AyanamiApp, download_path=DOWNLOAD_PATH):
+        super().__init__("msg",)
+        self.app = app
+        self.chat = app.chat
+        self.download_path = download_path
+
+    async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user = update.message.from_user
+        if user != None and self.app.is_authorized(user.id):
+            _, filename = await download_attachment_from_message(update.message, self.download_path)
+            prompt = self.__insert_file_info_into_prompt_using_template__(update.message.caption, file_name=filename)
+            ai_args = {"input_text": prompt, "username": update.message.from_user.first_name}
+            result = self.app.ai.invoke(ai_args)
+            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=result["output"])
+
+    def __insert_file_info_into_prompt_using_template__(self, prompt, file_name):
+        return self.PROMPT_TEMPLATE.format(user_message=prompt, file_name=file_name)
+
+    def create(self):
+        return MessageHandler(filters.ATTACHMENT & (~filters.COMMAND & ~filters.PHOTO), self.handle)
 
 class ResetCommand(CommandBase):
     def __init__(self, name, app: AyanamiApp):
