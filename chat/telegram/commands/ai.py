@@ -1,9 +1,9 @@
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, CommandHandler, filters
 from app.app import AyanamiApp
-from chat.multimedia.files import download_attachment_from_message, download_file_from_id
-from chat.multimedia.images import load_using_base64
-from models.command_base import CommandBase
+from chat.telegram.multimedia.files import download_attachment_from_message, download_file_from_id
+from chat.telegram.multimedia.images import load_using_base64
+from chat.telegram.commands.base import CommandBase
 
 class MessageCommand(CommandBase):
     def __init__(self, app: AyanamiApp):
@@ -43,7 +43,7 @@ class ImageCommand(CommandBase):
 
     async def __download_image_from_chat__(self, message, bot):
         file_id = message.photo[-1].file_id
-        path = await download_file_from_id(bot, file_id, self.download_path)
+        path, filename = await download_file_from_id(bot, file_id, self.download_path)
         return path
 
     def create(self):

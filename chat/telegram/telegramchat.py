@@ -1,6 +1,6 @@
 from chat.chatbase import ChatBase
-from chat.multimedia.text import split_phrases
-from models.command_base import CommandBase
+from chat.telegram.multimedia.text import split_phrases
+from chat.telegram.commands.base import CommandBase
 
 class TelegramChat(ChatBase):
     def __init__(self, telegram_app):

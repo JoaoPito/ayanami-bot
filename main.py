@@ -1,14 +1,14 @@
 import os
-from ai.langchain_factory import LangChainAIFactory
+from ai.langchain.langchain_factory import LangChainAIFactory
 from app.app_builder import AyanamiAppBuilder
-from app.commands.ai_commands import ChangeAICommand, DocumentCommand, ImageCommand, MessageCommand, ResetCommand
-from app.commands.app_commands import PingCommand, StartCommand
-from app.commands.auth_commands import RegisterUserCommand, TryAuthenticateUserCommand
+from chat.telegram.commands.ai import ChangeAICommand, DocumentCommand, ImageCommand, MessageCommand, ResetCommand
+from chat.telegram.commands.app import PingCommand, StartCommand
+from chat.telegram.commands.auth import TryAuthenticateUserCommand
 import app.tools_loader as tools_loader
 
 from auth.token_auth import TokenAuth
 
-from chat.telegramchat_factory import TelegramChatFactory
+from chat.telegram.telegramchat_factory import TelegramChatFactory
 import config
 
 import logging

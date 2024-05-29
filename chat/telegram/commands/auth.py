@@ -1,6 +1,6 @@
 from app.app import AyanamiApp
 from auth.auth_interface import AuthInterface
-from models.command_base import CommandBase
+from chat.telegram.commands.base import CommandBase
 from telegram import Update
 from telegram.ext import ContextTypes, CommandHandler
 

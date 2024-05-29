@@ -1,8 +1,8 @@
 import unittest
 
-from chat.telegramchat import TelegramChat
+from chat.telegram.telegramchat import TelegramChat
 from tests.app.stubs import EmptyAppStub
-from tests.chat.telegram.application_stubs import TelegramAppStub
+from tests.chat.telegram.stubs import TelegramAppStub
 from tests.models.command_stubs import MessageCommandStub
 
 from telegram.ext import filters

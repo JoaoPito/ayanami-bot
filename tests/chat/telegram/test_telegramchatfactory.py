@@ -1,7 +1,7 @@
 import unittest
 
-from chat.telegramchat import TelegramChat
-from chat.telegramchat_factory import TelegramChatFactory
+from chat.telegram.telegramchat import TelegramChat
+from chat.telegram.telegramchat_factory import TelegramChatFactory
 
 class TestTelegramChatFactory(unittest.TestCase):
     def test_if_return_correct_obj(self):

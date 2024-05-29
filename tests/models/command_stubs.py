@@ -1,4 +1,4 @@
-from models.command_base import CommandBase
+from chat.telegram.commands.base import CommandBase
 from telegram.ext import CommandHandler
 
 class MessageCommandStub(CommandBase):
