@@ -1,7 +1,7 @@
 import os
 from ai.langchain.langchain_factory import LangChainAIFactory
 from app.app_builder import AyanamiAppBuilder
-from chat.telegram.commands.ai import ChangeAICommand, DocumentCommand, ImageCommand, MessageCommand, ResetCommand
+from chat.telegram.commands.ai import ChangeAICommand, MessageCommand, ResetCommand
 from chat.telegram.commands.app import PingCommand, StartCommand
 from chat.telegram.commands.auth import TryAuthenticateUserCommand
 import app.tools_loader as tools_loader
@@ -42,8 +42,6 @@ def main():
 
     # AI commands
     app.add_command(MessageCommand(app))
-    app.add_command(ImageCommand(app))
-    app.add_command(DocumentCommand(app))
     app.add_command(ResetCommand('reset', app))
     app.add_command(ChangeAICommand('switch_ai', app, config.available_ai))
 
