@@ -1,4 +1,4 @@
-from models.command_base import CommandBase
+from chat.telegram.commands.base import CommandBase
 
 class ChatBase:
     def __init__(self):

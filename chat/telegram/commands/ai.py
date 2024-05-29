@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes, MessageHandler, CommandHandler, filters
 from app.app import AyanamiApp
 from chat.telegram.multimedia.files import download_attachment_from_message, download_file_from_id
 from chat.telegram.multimedia.images import load_using_base64
-from models.command_base import CommandBase
+from chat.telegram.commands.base import CommandBase
 
 class MessageCommand(CommandBase):
     def __init__(self, app: AyanamiApp):

@@ -1,6 +1,6 @@
 import asyncio
 from chat.chatbase import ChatBase
-from models.command_base import CommandBase
+from chat.telegram.commands.base import CommandBase
 
 class EmptyChatStub(ChatBase):
     filters = {"message": "msg"}

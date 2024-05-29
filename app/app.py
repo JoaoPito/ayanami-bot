@@ -1,7 +1,7 @@
 from auth.auth_interface import AuthInterface
 from ai.ai_interface import AIInterface
 from chat.chatbase import ChatBase
-from models.command_base import CommandBase
+from chat.telegram.commands.base import CommandBase
 
 class AyanamiApp():
     ai: AIInterface|None = None
