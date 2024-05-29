@@ -1,6 +1,6 @@
 from chat.chat_factory import ChatFactory
 from chat.chatbase import ChatBase
-from chat.telegramchat import TelegramChat
+from chat.telegram.telegramchat import TelegramChat
 
 from telegram.ext import ApplicationBuilder
 
