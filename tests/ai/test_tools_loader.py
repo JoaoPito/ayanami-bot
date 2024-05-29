@@ -1,5 +1,5 @@
 import unittest
-from app.tools_loader import load_tools_and_toolkits
+from ai.langchain.tools_loader import load_tools_and_toolkits
 import tests.tools.stubs as stubs
 
 CREATE_STRINGSTUB_PATH = "tests.tools.create_stringstub"

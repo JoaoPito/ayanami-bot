@@ -1,17 +1,18 @@
-from app.app import AyanamiApp
+from auth.auth_interface import AuthInterface
+from chat.chatbase import ChatBase
 from chat.telegram.commands.base import CommandBase
 from telegram import Update
 from telegram.ext import ContextTypes, CommandHandler
 
 class PingCommand(CommandBase):
-    def __init__(self, name, app: AyanamiApp):
+    def __init__(self, name, chat: ChatBase, auth: AuthInterface):
         super().__init__(name,)
-        self.app = app
-        self.chat = app.chat
+        self.chat = chat
+        self.auth = auth
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
-        if user != None and self.app.is_authorized(user.id):
+        if user != None and self.auth.is_authorized(user.id):
             await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text="pong")
         
     def create(self):
@@ -25,16 +26,16 @@ Hi, I'm {bot_name}, your personal virtual assistant! 😜 I love anime and sci-f
 Count on me for whatever you need! 
 I just need you to use the '/auth' command followed by the access token, like this: '/auth 12345' so I can give full access to you!"""
 
-    def __init__(self, name, app: AyanamiApp, message=DEFAULT_MESSAGE):
+    def __init__(self, name, chat: ChatBase, auth: AuthInterface, message=DEFAULT_MESSAGE):
         super().__init__(name,)
-        self.app = app
-        self.chat = app.chat
+        self.chat = chat
+        self.auth = auth
         self.message = message
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
         bot_name = await context.bot.getMyName()
-        self.app.auth.register_new_user(user.id)
+        self.auth.register_new_user(user.id)
         if user != None:
             await self.chat.send_message(context=context, 
                                          chat_id=update.effective_chat.id, 

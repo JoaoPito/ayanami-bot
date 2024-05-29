@@ -1,36 +1,36 @@
-from app.app import AyanamiApp
 from auth.auth_interface import AuthInterface
+from chat.chatbase import ChatBase
 from chat.telegram.commands.base import CommandBase
 from telegram import Update
 from telegram.ext import ContextTypes, CommandHandler
 
 class RegisterUserCommand(CommandBase):
-    def __init__(self, name, app: AyanamiApp):
+    def __init__(self, name, auth: AuthInterface):
         super().__init__(name,)
-        self.app = app
+        self.auth = auth
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.message.from_user.id
-        self.app.auth.register_new_user(user_id)
+        self.auth.register_new_user(user_id)
 
     def create(self):
         return CommandHandler(self.name, self.handle)
 
 class TryAuthenticateUserCommand(CommandBase):
-    def __init__(self, name, app: AyanamiApp):
+    def __init__(self, name, chat: ChatBase, auth: AuthInterface):
         super().__init__(name,)
-        self.app = app
-        self.chat = app.chat
+        self.chat = chat
+        self.auth = auth
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
-        if user != None and not self.app.is_authorized(user.id):
+        if user != None and not self.auth.is_authorized(user.id):
             input_token = context.args[0]
             try:
-                self.app.auth.try_authorize_user(user.id, input_token)
+                self.auth.try_authorize_user(user.id, input_token)
                 await self.chat.send_message(context=context, 
                                             chat_id=update.effective_chat.id,
-                                            text="Ok!")
+                                            text="Registered! You can now send me messages.")
             except (AuthInterface.InvalidCriteriaError, AuthInterface.ForbiddenError) as exc:
                 await self.chat.send_message(context=context, 
                                             chat_id=update.effective_chat.id,
