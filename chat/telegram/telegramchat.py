@@ -1,5 +1,5 @@
 from chat.chatbase import ChatBase
-from chat.multimedia.text import split_phrases
+from chat.telegram.multimedia.text import split_phrases
 from models.command_base import CommandBase
 
 class TelegramChat(ChatBase):
