@@ -4,7 +4,7 @@ class ChatInterface:
     def __init__(self):
         pass
 
-    def add_handler(self, command: CommandBase):
+    def add_command(self, command: CommandBase):
         pass
 
     def run(self):

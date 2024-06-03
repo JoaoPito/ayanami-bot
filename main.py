@@ -33,16 +33,16 @@ def main():
     auth = TokenAuth(create_dbcontext(path="./users.db"), config_auth)
 
     # AI commands
-    chat.add_handler(MessageCommand(chat, ai, auth))
-    chat.add_handler(ResetCommand('reset', chat, ai, auth))
-    chat.add_handler(ChangeAICommand('switch_ai', config.available_ai, ai, chat, auth))
+    chat.add_command(MessageCommand(chat, ai, auth))
+    chat.add_command(ResetCommand('reset', chat, ai, auth))
+    chat.add_command(ChangeAICommand('switch_ai', config.available_ai, ai, chat, auth))
 
     # App commands
-    chat.add_handler(PingCommand('ping', chat, auth))
+    chat.add_command(PingCommand('ping', chat, auth))
 
     # Auth commands
-    chat.add_handler(StartCommand('start', chat, auth))
-    chat.add_handler(TryAuthenticateUserCommand('auth', chat, auth))
+    chat.add_command(StartCommand('start', chat, auth))
+    chat.add_command(TryAuthenticateUserCommand('auth', chat, auth))
 
     logging.info(f"> IMPORTANT: This session token is: '{auth.session_token}', use it to authenticate with '/auth TOKEN.'")
 

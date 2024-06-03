@@ -12,7 +12,7 @@ class EmptyChatStub(ChatInterface):
     def __init__(self):
         pass
 
-    def add_handler(self, command: CommandBase):
+    def add_command(self, command: CommandBase):
         self.has_called_add_handler = True
         self.handlers[command.name] = command.handle
     

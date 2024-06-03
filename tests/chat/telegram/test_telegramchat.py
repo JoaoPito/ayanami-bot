@@ -20,7 +20,7 @@ class TestTelegramChat(unittest.TestCase):
 
     def test_if_assigns_handlers_correctly(self):
         command = self.__build_command_stub__()
-        self.chat.add_handler(command)
+        self.chat.add_command(command)
         handlers_callbacks = list(map(lambda k: self.telegram_app.handlers_added[k].callback, list(self.telegram_app.handlers_added)))
         self.assertIn(command.handle, handlers_callbacks)
 

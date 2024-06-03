@@ -4,6 +4,7 @@ from core.ai.ai_interface import AIInterface
 from auth.auth_interface import AuthInterface
 from core.chat.chatinterface import ChatInterface
 from chat.telegram.commands.base import CommandBase
+from core.requests.request import Request
 
 class MessageCommand(CommandBase):
     def __init__(self, chat: ChatInterface, ai: AIInterface, auth: AuthInterface):
@@ -15,9 +16,9 @@ class MessageCommand(CommandBase):
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.message.from_user
         if user != None and self.auth.is_authorized(user.id):
-            ai_args = {"input_text": update.message.text, "username": update.message.from_user.first_name}
-            result = self.ai.invoke(ai_args)
-            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=result["output"])
+            ai_request = Request(username=update.message.from_user.first_name, text=update.message.text)
+            response = self.ai.invoke(ai_request)
+            await self.chat.send_message(context=context, chat_id=update.effective_chat.id, text=response.text)
 
     def create(self):
         return MessageHandler(filters.TEXT & (~filters.COMMAND), self.handle)
@@ -63,8 +64,8 @@ class ChangeAICommand(CommandBase):
         user = update.message.from_user
         if user != None and self.auth.is_authorized(user.id):
             args = context.args
-            model, temp, system = self.__get_params_from_args__(args)
             try:
+                model, temp, system = self.__get_params_from_args__(args)
                 await self.chat.send_message(context=context, 
                                             chat_id=update.effective_chat.id,
                                             text=f"Updated AI with model '{self.available_ai[model]}', temp {temp} and system prompt '{system}'")

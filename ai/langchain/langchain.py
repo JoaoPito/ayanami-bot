@@ -6,6 +6,9 @@ from langchain.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputP
 from langchain.agents import AgentExecutor
 from langchain_core.messages import AIMessage, HumanMessage
 
+from core.requests.request import Request
+from core.responses.response import Response
+
 MEMORY_KEY = 'chat_history'
 TOOL_SCRATCHPAD_KEY = 'agent_scratchpad'
 
@@ -64,13 +67,16 @@ class LangChainAI(AIInterface):
         pass # Persist log to a file or DB
 
     def __create_human_message__(self, args):
+        # Formats message to include multimedia files
         input_text = args["input_text"]
         humanmessage_content = [
                 {"type": "text", "text": f"{input_text}"}
             ]
         return HumanMessage(content=humanmessage_content)
 
-    def invoke(self, args):
+    def invoke(self, req: Request) -> Response:
+        args = {"input_text": req.text, "username": req.username}
+
         args[MEMORY_KEY] = self.chat_history
         human_message = self.__create_human_message__(args)
         agent_executor = AgentExecutor(agent=self.__create_agent__(human_message), tools=self.tools, verbose=True)
@@ -78,7 +84,8 @@ class LangChainAI(AIInterface):
         result = agent_executor.invoke(args)
         self.__add_to_history__(human_message, AIMessage(content=result['output'],))
         self.__persist_history_log__()
-        return result
+
+        return Response(text=result["output"])
     
     def reset_history(self):
         self.chat_history = []
