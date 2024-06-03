@@ -1,0 +1,2 @@
+class Response:
+    text: str
