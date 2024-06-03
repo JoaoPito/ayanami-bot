@@ -1,6 +1,6 @@
 from chat.telegram.commands.base import CommandBase
 
-class ChatBase:
+class ChatInterface:
     def __init__(self):
         pass
 

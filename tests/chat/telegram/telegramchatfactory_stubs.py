@@ -1,4 +1,4 @@
-from chat.chat_factory import ChatFactory
+from core.chat.chat_factory import ChatFactory
 from chat.telegram.telegramchat import TelegramChat
 from tests.chat.telegram.stubs import TelegramAppStub
 

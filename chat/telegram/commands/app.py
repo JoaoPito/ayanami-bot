@@ -1,11 +1,11 @@
 from auth.auth_interface import AuthInterface
-from chat.chatbase import ChatBase
+from core.chat.chatinterface import ChatInterface
 from chat.telegram.commands.base import CommandBase
 from telegram import Update
 from telegram.ext import ContextTypes, CommandHandler
 
 class PingCommand(CommandBase):
-    def __init__(self, name, chat: ChatBase, auth: AuthInterface):
+    def __init__(self, name, chat: ChatInterface, auth: AuthInterface):
         super().__init__(name,)
         self.chat = chat
         self.auth = auth
@@ -26,7 +26,7 @@ Hi, I'm {bot_name}, your personal virtual assistant! 😜 I love anime and sci-f
 Count on me for whatever you need! 
 I just need you to use the '/auth' command followed by the access token, like this: '/auth 12345' so I can give full access to you!"""
 
-    def __init__(self, name, chat: ChatBase, auth: AuthInterface, message=DEFAULT_MESSAGE):
+    def __init__(self, name, chat: ChatInterface, auth: AuthInterface, message=DEFAULT_MESSAGE):
         super().__init__(name,)
         self.chat = chat
         self.auth = auth

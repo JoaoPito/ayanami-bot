@@ -1,8 +1,8 @@
 import asyncio
-from chat.chatbase import ChatBase
+from core.chat.chatinterface import ChatInterface
 from chat.telegram.commands.base import CommandBase
 
-class EmptyChatStub(ChatBase):
+class EmptyChatStub(ChatInterface):
     filters = {"message": "msg"}
     has_called_add_handler = False
     has_run = False

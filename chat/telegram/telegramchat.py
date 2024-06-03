@@ -1,8 +1,8 @@
-from chat.chatbase import ChatBase
+from core.chat.chatinterface import ChatInterface
 from chat.telegram.multimedia.text import split_phrases
 from chat.telegram.commands.base import CommandBase
 
-class TelegramChat(ChatBase):
+class TelegramChat(ChatInterface):
     def __init__(self, telegram_app):
         self.telegram_app = telegram_app
         return super().__init__()

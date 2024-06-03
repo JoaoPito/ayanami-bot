@@ -2,11 +2,11 @@ from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, CommandHandler, filters
 from core.ai.ai_interface import AIInterface
 from auth.auth_interface import AuthInterface
-from chat.chatbase import ChatBase
+from core.chat.chatinterface import ChatInterface
 from chat.telegram.commands.base import CommandBase
 
 class MessageCommand(CommandBase):
-    def __init__(self, chat: ChatBase, ai: AIInterface, auth: AuthInterface):
+    def __init__(self, chat: ChatInterface, ai: AIInterface, auth: AuthInterface):
         super().__init__("msg",)
         self.chat = chat
         self.ai = ai
@@ -23,7 +23,7 @@ class MessageCommand(CommandBase):
         return MessageHandler(filters.TEXT & (~filters.COMMAND), self.handle)
 
 class ResetCommand(CommandBase):
-    def __init__(self, name, chat: ChatBase, ai: AIInterface, auth: AuthInterface):
+    def __init__(self, name, chat: ChatInterface, ai: AIInterface, auth: AuthInterface):
         super().__init__(name,)
         self.chat = chat
         self.ai = ai
@@ -39,7 +39,7 @@ class ResetCommand(CommandBase):
         return CommandHandler(self.name, self.handle)
     
 class ChangeAICommand(CommandBase):
-    def __init__(self, name, config, ai: AIInterface, chat: ChatBase, auth: AuthInterface):
+    def __init__(self, name, config, ai: AIInterface, chat: ChatInterface, auth: AuthInterface):
         super().__init__(name,)
         self.chat = chat
         self.ai = ai

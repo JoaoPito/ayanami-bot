@@ -1,5 +1,5 @@
 from auth.auth_interface import AuthInterface
-from chat.chatbase import ChatBase
+from core.chat.chatinterface import ChatInterface
 from chat.telegram.commands.base import CommandBase
 from telegram import Update
 from telegram.ext import ContextTypes, CommandHandler
@@ -17,7 +17,7 @@ class RegisterUserCommand(CommandBase):
         return CommandHandler(self.name, self.handle)
 
 class TryAuthenticateUserCommand(CommandBase):
-    def __init__(self, name, chat: ChatBase, auth: AuthInterface):
+    def __init__(self, name, chat: ChatInterface, auth: AuthInterface):
         super().__init__(name,)
         self.chat = chat
         self.auth = auth
