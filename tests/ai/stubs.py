@@ -1,4 +1,4 @@
-from ai.ai_interface import AIInterface
+from core.ai.ai_interface import AIInterface
 
 class EmptyAIStub(AIInterface):
     has_run = False

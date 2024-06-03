@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, CommandHandler, filters
-from ai.ai_interface import AIInterface
+from core.ai.ai_interface import AIInterface
 from auth.auth_interface import AuthInterface
 from chat.chatbase import ChatBase
 from chat.telegram.commands.base import CommandBase

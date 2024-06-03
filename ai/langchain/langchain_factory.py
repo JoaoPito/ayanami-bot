@@ -1,4 +1,4 @@
-from ai.ai_factory import AIFactory
+from core.ai.ai_factory import AIFactory
 from ai.langchain.langchain import LangChainAI
 
 class LangChainAIFactory(AIFactory):

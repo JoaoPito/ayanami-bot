@@ -1,4 +1,4 @@
-from ai.ai_interface import AIInterface
+from core.ai.ai_interface import AIInterface
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.agents.format_scratchpad.openai_tools import format_to_openai_tool_messages
